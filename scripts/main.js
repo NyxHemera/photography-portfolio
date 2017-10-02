@@ -49,6 +49,9 @@ function createAndAttachImage(el, img, highResImg) {
 	highResImg.style.height = el.height + 'px';
 
 	fullGallery.style.display = 'inline';
+	setTimeout(function() {
+		fullGallery.style.background = 'black';
+	}, 10);
 
 	highResImg.onload = function() {
 		img.style.opacity = 0;
@@ -75,12 +78,19 @@ function scaleAndTranslateImageToFull(el, img, highResImg) {
 
 function calcScale(imgWidth, imgHeight, currWidth, currHeight, padding) {
 	let windowWidth = window.innerWidth;
-	let windowHeight = window.innerWidth;
+	let windowHeight = window.innerHeight;
 
 	let maxWinWidthScale = windowWidth / currWidth - padding / currWidth;
 	let maxWinHeightScale = windowHeight / currHeight - padding / currHeight;
 	let maxImgWidthScale = imgWidth / currWidth - padding / currWidth;
 	let maxImgHeightScale = imgHeight / currHeight - padding / currHeight;
+
+	console.log(windowWidth);
+	console.log(windowHeight);
+	console.log(maxWinWidthScale);
+	console.log(maxWinHeightScale);
+	console.log(maxImgWidthScale);
+	console.log(maxImgHeightScale);
 
 	return Math.min(maxWinWidthScale, maxWinHeightScale, maxImgWidthScale, maxImgHeightScale);
 }
@@ -115,6 +125,7 @@ function closeGallery() {
 				childNodes[i].style.transform = `translate(${intermediateX}px, ${intermediateY}px) scale(${intermediateScale})`;
 
 				// Move back to origin after allowing animation to end
+				fullGallery.style.background = '';
 				setTimeout(function() {
 					childNodes[i].style.transition = 'all .5s ease';
 					childNodes[i].style.transform = `translate(${origImgObj.el.x}px, ${origImgObj.el.y}px) scale(1)`;
