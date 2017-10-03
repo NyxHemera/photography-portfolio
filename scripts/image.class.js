@@ -1,18 +1,25 @@
+const galleryPadding = 100;
+
 class GalleryImage {
-	constructor(index, thumb) {
+	constructor(index, thumb, gallery) {
 		this.lowResEl = document.createElement('img');
 		this.highResEl = document.createElement('img');
 		this.index = index;
+		this.setPosition(gallery.index);
 		this.thumb = thumb;
+		this.gallery = gallery;
 
 		this.setImageSrc();
-		this.setImageDims(this.thumb.width, this.thumb.height);
-		this.setImageTransform(this.thumb.x, this.thumb.y);
+		let thumbRect = thumb.getBoundingClientRect();
+		this.setImageDims(thumbRect.width, thumbRect.height);
+		this.setImageTransform(thumbRect.x, thumbRect.y);
+		this.scale = this.calcScale();
+		this.translate = this.calcTranslate();
 	}
 
-	appendToElement(fullGallery) {
-		fullGallery.appendChild(this.lowResEl);
-		fullGallery.appendChild(this.highResEl);
+	appendToGallery() {
+		this.gallery.el.appendChild(this.lowResEl);
+		this.gallery.el.appendChild(this.highResEl);
 
 		this.highResEl.onload = () => {
 			this.lowResEl.style.opacity = 0;
@@ -45,12 +52,12 @@ class GalleryImage {
 	}
 
 	translateAndScaleFromThumbToFull() {
-		let scale = this.calcScale();
-		let translate = this.calcTranslate();
-
 		this.toggleThumb();
-		this.toggleTransition();
-		this.setImageTransform(translate.x, translate.y, scale);
+		this.setTransition(true);
+		// If this isn't a timeout, it transitions too quickly, causing the image to jump
+		setTimeout(() => {
+			this.setImageTransform(this.translate.x, this.translate.y, this.scale);
+		}, 0)
 	}
 
 	setImageDims(width, height) {
@@ -61,8 +68,8 @@ class GalleryImage {
 	}
 
 	setImageSrc() {
-		this.lowResEl.src = paths.thumb + photoList[this.index];
-		this.highResEl.src = paths.med + photoList[this.index];
+		this.lowResEl.src = paths.thumb + this.gallery.photoList[this.index];
+		this.highResEl.src = paths.med + this.gallery.photoList[this.index];
 	}
 
 	setImageTransform(x, y, scale) {
@@ -75,12 +82,16 @@ class GalleryImage {
 		this.highResEl.style.transform = trans;
 	}
 
-	toggleThumb() {
-		this.thumb.style.visibility = this.thumb.style.visibility == 'hidden' ? 'visible' : 'hidden';
+	setPosition(index) {
+		this.position = this.index - index;
 	}
 
-	toggleTransition() {
-		this.lowResEl.style.transition = this.lowResEl.style.transition == '' ? 'all .5s ease' : '';
-		this.highResEl.style.transition = this.highResEl.style.transition == '' ? 'all .5s ease' : '';
+	setTransition(on) {
+		this.lowResEl.style.transition = on ? 'all .5s ease' : '';
+		this.highResEl.style.transition = on ? 'all .5s ease' : '';
+	}
+
+	toggleThumb() {
+		this.thumb.style.visibility = this.thumb.style.visibility == 'hidden' ? 'visible' : 'hidden';
 	}
 }
