@@ -1,5 +1,6 @@
 let origImgObj = {
 	el: undefined,
+	selectedIndex: 0,
 	scale: 1,
 	translate: {
 		x: 0,
@@ -10,21 +11,67 @@ let origImgObj = {
 let fullGalleryOpen = false;
 
 let fullGallery = document.getElementById('fullGallery');
+let thumbs = document.getElementsByClassName('photoThumb');
+
+let photoList = [
+	'cooper_scarf.jpg',
+	'lucca.jpg',
+	'cooper_scruff.jpg'
+];
+
+let paths = {
+	thumb : './assets/thumb/',
+	med 	: './assets/med/',
+	large : './assets/large/'
+};
+
+const galleryPadding = 100;
 
 
 function initGallery(event) {
 	let el = event.srcElement;
-	let img = document.createElement("img");
-	let highResImg = document.createElement("img");
+	let img = document.createElement('img');
+	let highResImg = document.createElement('img');
 
 	// Prevent clicking on hidden thumbnails
 	if(!fullGalleryOpen) {
 		fullGalleryOpen = true;
 		origImgObj.el = el;
 
+		origImgObj.selectedIndex = findSelectedIndex(el);
+
 		createAndAttachImage(el, img, highResImg);
 		scaleAndTranslateImageToFull(el, img, highResImg);
+		// createAndAttachSideImages();
 	}
+}
+
+function createAndAttachSideImages() {
+	for(let i = 0; i < photoList.length; i++) {
+		if(i == origImgObj.selectedIndex) {
+			continue;
+		}else {
+			let range = i - origImgObj.selectedIndex;
+			let img = document.createElement('img');
+			let highResImg = document.createElement('img');
+			let scale = calcScale(thumbs[i].width, thumbs[i].height);
+
+			setImageSrc(img, highResImg, origImgObj.selectedIndex);
+			setImageDims(img, highResImg, thumbs[i].width, thumbs[i].height);
+		}
+	}
+}
+
+function setImageSrc(img, highResImg, index) {
+	img.src = paths.thumb + photoList[index];
+	highResImg.src = paths.med + photoList[index];
+}
+
+function setImageDims(img, highResImg, width, height) {
+	img.style.width = width + 'px';
+	img.style.height = height + 'px';
+	highResImg.style.width = width + 'px';
+	highResImg.style.height = height + 'px';
 }
 
 // Attaches the gallery image to the thumbnail location
@@ -34,19 +81,16 @@ function createAndAttachImage(el, img, highResImg) {
 	// The following manages transitioning between low and high quality images
 	// All transformations must be applied to both images, since we don't know
 	// how long it will take the image to load and they must stay together.
-	img.src = './assets/luccaSmall.jpg';
-	highResImg.src = './assets/luccaMed.jpg';
+	setImageSrc(img, highResImg, origImgObj.selectedIndex);
 
 	fullGallery.appendChild(highResImg);
 	fullGallery.appendChild(img);
 
-	img.style.transform = `translate(${el.x}px, ${el.y}px`;
-	img.style.width = el.width + 'px';
-	img.style.height = el.height + 'px';
+	setImageDims(img, highResImg, el.width, el.height);
 
+	img.style.transform = `translate(${el.x}px, ${el.y}px`;
 	highResImg.style.transform = `translate(${el.x}px, ${el.y}px`;
-	highResImg.style.width = el.width + 'px';
-	highResImg.style.height = el.height + 'px';
+
 
 	fullGallery.style.display = 'inline';
 	setTimeout(function() {
@@ -66,7 +110,7 @@ function createAndAttachImage(el, img, highResImg) {
 }
 
 function scaleAndTranslateImageToFull(el, img, highResImg) {
-	let scale = calcScale(1770, 2825, el.width, el.height, 100);
+	let scale = calcScale(el.width, el.height);
 	let translate = calcTranslate(scale, el.width, el.height);
 
 	el.style.visibility = 'hidden';
@@ -76,23 +120,11 @@ function scaleAndTranslateImageToFull(el, img, highResImg) {
 	highResImg.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
 }
 
-function calcScale(imgWidth, imgHeight, currWidth, currHeight, padding) {
-	let windowWidth = window.innerWidth;
-	let windowHeight = window.innerHeight;
+function calcScale(currWidth, currHeight) {
+	let maxWinWidthScale = (window.innerWidth / currWidth) - (galleryPadding / currWidth);
+	let maxWinHeightScale = (window.innerHeight / currHeight) - (galleryPadding / currHeight);
 
-	let maxWinWidthScale = windowWidth / currWidth - padding / currWidth;
-	let maxWinHeightScale = windowHeight / currHeight - padding / currHeight;
-	let maxImgWidthScale = imgWidth / currWidth - padding / currWidth;
-	let maxImgHeightScale = imgHeight / currHeight - padding / currHeight;
-
-	console.log(windowWidth);
-	console.log(windowHeight);
-	console.log(maxWinWidthScale);
-	console.log(maxWinHeightScale);
-	console.log(maxImgWidthScale);
-	console.log(maxImgHeightScale);
-
-	return Math.min(maxWinWidthScale, maxWinHeightScale, maxImgWidthScale, maxImgHeightScale);
+	return Math.min(maxWinWidthScale, maxWinHeightScale);
 }
 
 function calcTranslate(scale, currWidth, currHeight) {
@@ -148,16 +180,20 @@ function closeGallery() {
 	}
 }
 
+function findSelectedIndex(el) {
+	return photoList.findIndex(name => {
+		return el.src && el.src.includes(name);
+	});
+}
+
 
 // Event Listeners:
 
-let thumbs = document.getElementsByClassName('photoThumb');
-
 for(let i = 0; i < thumbs.length; i++) {
-	thumbs[i].addEventListener("click", initGallery);
+	thumbs[i].addEventListener('click', initGallery);
 }
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener('keydown', function(event) {
 	if(event.keyCode == 27) {
 		closeGallery();
 	}
