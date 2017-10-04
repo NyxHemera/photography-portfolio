@@ -1,6 +1,5 @@
 let fullGalleryOpen = false;
 
-let fullGallery = document.getElementById('fullGallery');
 let thumbs = document.getElementsByClassName('photoThumb');
 
 let photoList = [

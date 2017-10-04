@@ -52,7 +52,10 @@ class GalleryImage {
 	}
 
 	getThumbRect() {
-		return this.thumb.getBoundingClientRect();
+		let rect = this.thumb.getBoundingClientRect();
+		rect.x = rect.x ? rect.x : rect.left;
+		rect.y = rect.y ? rect.y : rect.top;
+		return rect;
 	}
 
 	translateAndScaleFromThumbToFull() {

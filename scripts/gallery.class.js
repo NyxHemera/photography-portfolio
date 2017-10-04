@@ -8,6 +8,7 @@ class Gallery {
 		this.el.id = 'fullGallery';
 		document.body.appendChild(this.el);
 
+		this.boundKeydownListener = event => this.keydownListener(event);
 		this.initListeners();
 	}
 
@@ -27,7 +28,7 @@ class Gallery {
 				img.setImageTransform(targetX, img.translate.y, img.scale);
 				img.appendToGallery();
 
-				i < this.index ? this.elList.unshift(img) : this.elList.push(img);
+				i < this.index ? this.elList.splice(i, 0, img) : this.elList.push(img);
 			}
 		}
 	}
@@ -38,14 +39,12 @@ class Gallery {
 			if(i == this.index) { // on the center image
 				// Fix to keep image from teleporting back to start
 				window.requestAnimationFrame(() => {
-					let rect = img.highResEl.getBoundingClientRect();
+					let imgRect = img.highResEl.getBoundingClientRect();
 					let thumbRect = img.getThumbRect();
-					let intermediateWidth = rect.right - rect.left;
-					let intermediateHeight = rect.bottom - rect.top;
-					let intermediateScale = intermediateWidth / thumbRect.width;
-					// Find the difference between current and orig dimensions
-					let intermediateX = rect.left + (intermediateWidth - thumbRect.width) / 2;
-					let intermediateY = rect.top + (intermediateHeight - thumbRect.height) / 2;
+					let intermediateScale = imgRect.width / thumbRect.width;
+					// Find the difference between current and thumb dimensions
+					let intermediateX = imgRect.left + (imgRect.width - thumbRect.width) / 2;
+					let intermediateY = imgRect.top + (imgRect.height - thumbRect.height) / 2;
 
 					// Stop the animation in its tracks
 					img.setTransition(false);
@@ -60,24 +59,21 @@ class Gallery {
 						img.highResEl.addEventListener('transitionend', () => {
 							img.setThumb(true);
 							this.el.style.display = 'none';
-
-							// Remove all gallery images
-							// while (fullGallery.hasChildNodes()) {
-							// 	fullGallery.removeChild(fullGallery.lastChild);
-							// }
-
-							// fullGalleryOpen = false;
-
+							this.el.parentNode.removeChild(this.el);
+							fullGalleryOpen = false;
 						});
 					}, 20);
 				});
 			} else {
 				img.setThumb(true);
-				// delete other images
-				this.el.removeChild(img.lowResEl);
-				this.el.removeChild(img.highResEl);
 			}
 		}
+
+		this.destroyListeners();
+	}
+
+	destroyListeners() {
+		document.removeEventListener('keydown', this.boundKeydownListener);
 	}
 
 	findSelectedIndex(el) {
@@ -87,19 +83,21 @@ class Gallery {
 	}
 
 	initListeners() {
-		document.addEventListener('keydown', (event) => {
-			switch(event.keyCode) {
-				case 27:
-					this.destroyGallery();
-					break;
-				case 37:
-					this.back();
-					break;
-				case 39:
-					this.next();
-					break;
-			}
-		});
+		document.addEventListener('keydown', this.boundKeydownListener);
+	}
+
+	keydownListener(event) {
+		switch(event.keyCode) {
+			case 27:
+				this.destroyGallery();
+				break;
+			case 37:
+				this.back();
+				break;
+			case 39:
+				this.next();
+				break;
+		}
 	}
 
 	next() {
