@@ -10,7 +10,7 @@ class GalleryImage {
 		this.gallery = gallery;
 
 		this.setImageSrc();
-		let thumbRect = thumb.getBoundingClientRect();
+		let thumbRect = this.getThumbRect();
 		this.setImageDims(thumbRect.width, thumbRect.height);
 		this.setImageTransform(thumbRect.x, thumbRect.y);
 		this.scale = this.calcScale();
@@ -51,8 +51,12 @@ class GalleryImage {
 
 	}
 
+	getThumbRect() {
+		return this.thumb.getBoundingClientRect();
+	}
+
 	translateAndScaleFromThumbToFull() {
-		this.toggleThumb();
+		this.setThumb(false);
 		this.setTransition(true);
 		// If this isn't a timeout, it transitions too quickly, causing the image to jump
 		setTimeout(() => {
@@ -86,12 +90,13 @@ class GalleryImage {
 		this.position = this.index - index;
 	}
 
+	setThumb(visible) {
+		this.thumb.style.visibility = visible ? 'visible' : 'hidden';
+	}
+
 	setTransition(on) {
 		this.lowResEl.style.transition = on ? 'all .5s ease' : '';
 		this.highResEl.style.transition = on ? 'all .5s ease' : '';
 	}
 
-	toggleThumb() {
-		this.thumb.style.visibility = this.thumb.style.visibility == 'hidden' ? 'visible' : 'hidden';
-	}
 }

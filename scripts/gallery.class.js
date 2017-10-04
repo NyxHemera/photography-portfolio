@@ -32,22 +32,72 @@ class Gallery {
 		}
 	}
 
+	destroyGallery() {
+		for(let i = 0; i < this.elList.length; i++) {
+			let img = this.elList[i];
+			if(i == this.index) { // on the center image
+				// Fix to keep image from teleporting back to start
+				window.requestAnimationFrame(() => {
+					let rect = img.highResEl.getBoundingClientRect();
+					let thumbRect = img.getThumbRect();
+					let intermediateWidth = rect.right - rect.left;
+					let intermediateHeight = rect.bottom - rect.top;
+					let intermediateScale = intermediateWidth / thumbRect.width;
+					// Find the difference between current and orig dimensions
+					let intermediateX = rect.left + (intermediateWidth - thumbRect.width) / 2;
+					let intermediateY = rect.top + (intermediateHeight - thumbRect.height) / 2;
+
+					// Stop the animation in its tracks
+					img.setTransition(false);
+					img.setImageTransform(intermediateX, intermediateY, intermediateScale);
+
+					// Move back to origin after allowing animation to end
+					this.el.style.background = '';
+					setTimeout(() => {
+						img.setTransition(true);
+						img.setImageTransform(thumbRect.x, thumbRect.y, 1);
+
+						img.highResEl.addEventListener('transitionend', () => {
+							img.setThumb(true);
+							this.el.style.display = 'none';
+
+							// Remove all gallery images
+							// while (fullGallery.hasChildNodes()) {
+							// 	fullGallery.removeChild(fullGallery.lastChild);
+							// }
+
+							// fullGalleryOpen = false;
+
+						});
+					}, 20);
+				});
+			} else {
+				img.setThumb(true);
+				// delete other images
+				this.el.removeChild(img.lowResEl);
+				this.el.removeChild(img.highResEl);
+			}
+		}
+	}
+
 	findSelectedIndex(el) {
 		return this.photoList.findIndex(name => {
 			return el.src && el.src.includes(name);
 		});
 	}
 
-	hide() {
-
-	}
-
 	initListeners() {
 		document.addEventListener('keydown', (event) => {
-			if(event.keyCode == 37) {
-				this.back();
-			}else if(event.keyCode == 39) {
-				this.next();
+			switch(event.keyCode) {
+				case 27:
+					this.destroyGallery();
+					break;
+				case 37:
+					this.back();
+					break;
+				case 39:
+					this.next();
+					break;
 			}
 		});
 	}
@@ -62,6 +112,7 @@ class Gallery {
 			let img = this.elList[i];
 			img.setTransition(true);
 			img.setPosition(this.index);
+			img.setThumb(false);
 			let targetX = window.innerWidth * 2 * img.position;
 
 			if(img.position == 0) {
