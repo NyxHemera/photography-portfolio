@@ -18,8 +18,8 @@ class GalleryImage {
 	}
 
 	appendToGallery() {
-		this.gallery.el.appendChild(this.lowResEl);
 		this.gallery.el.appendChild(this.highResEl);
+		this.gallery.el.appendChild(this.lowResEl);
 
 		this.highResEl.onload = () => {
 			this.lowResEl.style.opacity = 0;
