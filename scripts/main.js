@@ -14,6 +14,29 @@ let paths = {
 	large : './assets/large/'
 };
 
+let portfolio = [
+	{
+		content: 'Cooper',
+		type: 'text'
+	},
+	{
+		content: 'cooper_scarf.jpg',
+		type: 'image'
+	},
+	{
+		content: 'cooper_scruff.jpg',
+		type: 'image'
+	},
+	{
+		content: 'Lucca',
+		type: 'text'
+	},
+	{
+		content: 'lucca.jpg',
+		type: 'image'
+	}
+];
+
 function initGallery(event) {
 	let el = event.srcElement;
 	let gallery = undefined;
@@ -21,7 +44,7 @@ function initGallery(event) {
 	if(!fullGalleryOpen) {
 		fullGalleryOpen = true;
 
-		gallery = new Gallery(el, photoList);
+		gallery = new Gallery(el, portfolio);
 		gallery.show();
 		gallery.zoomToFull();
 		gallery.createAndAttachSideImages();

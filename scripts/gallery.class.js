@@ -1,6 +1,6 @@
 class Gallery {
-	constructor(thumb, photoList) {
-		this.photoList = photoList;
+	constructor(thumb, portfolio) {
+		this.portfolio = portfolio;
 		this.index = this.findSelectedIndex(thumb);
 		this.el = document.createElement('div');
 		this.elList = [];
@@ -13,22 +13,30 @@ class Gallery {
 	}
 
 	back() {
-		this.index = this.index == 0 ? this.photoList.length - 1 : this.index - 1;
+		this.index = this.index == 0 ? this.portfolio.length - 1 : this.index - 1;
 		this.recalculateImagePositions();
 	}
 
 	createAndAttachSideImages() {
-		for(let i = 0; i < photoList.length; i++) {
+		for(let i = 0; i < portfolio.length; i++) {
 			if(i == this.index) {
 				continue;
 			}else {
-				let img = new GalleryImage(i, thumbs[i], this);
-				let targetX = window.innerWidth * 2 * img.position; // needs work
+				let el = null;
 
-				img.setImageTransform(targetX, img.translate.y, img.scale);
-				img.appendToGallery();
+				if(portfolio[i].type == 'image') {
+					el = new GalleryImage(i, thumbs[i], this, portfolio[i]);
 
-				i < this.index ? this.elList.splice(i, 0, img) : this.elList.push(img);
+					let targetX = window.innerWidth * 2 * el.position; // needs work
+					el.setImageTransform(targetX, el.translate.y, el.scale);
+				}else {
+					el = new GalleryText(i, this, portfolio[i]);
+				}
+
+
+				el.appendToGallery();
+
+				i < this.index ? this.elList.splice(i, 0, el) : this.elList.push(el);
 			}
 		}
 	}
@@ -77,8 +85,8 @@ class Gallery {
 	}
 
 	findSelectedIndex(el) {
-		return this.photoList.findIndex(name => {
-			return el.src && el.src.includes(name);
+		return this.portfolio.findIndex(obj => {
+			return obj.type == 'image' && el.src && el.src.includes(obj.content);
 		});
 	}
 
@@ -101,12 +109,12 @@ class Gallery {
 	}
 
 	next() {
-		this.index = this.index == this.photoList.length - 1 ? 0 : this.index + 1;
+		this.index = this.index == this.portfolio.length - 1 ? 0 : this.index + 1;
 		this.recalculateImagePositions();
 	}
 
 	recalculateImagePositions() {
-		for(let i = 0; i < photoList.length; i++) {
+		for(let i = 0; i < portfolio.length; i++) {
 			let img = this.elList[i];
 			img.setTransition(true);
 			img.setPosition(this.index);
@@ -129,7 +137,7 @@ class Gallery {
 	}
 
 	zoomToFull() {
-		let img = new GalleryImage(this.index, thumbs[this.index], this);
+		let img = new GalleryImage(this.index, thumbs[this.index], this, this.portfolio[this.index]);
 		this.elList.push(img);
 		img.appendToGallery();
 		img.translateAndScaleFromThumbToFull();

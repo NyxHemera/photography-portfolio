@@ -1,13 +1,10 @@
-const galleryPadding = 100;
+class GalleryImage extends GalleryObj {
+	constructor(index, thumb, gallery, portObj) {
+		super(index, gallery, portObj);
 
-class GalleryImage {
-	constructor(index, thumb, gallery) {
 		this.lowResEl = document.createElement('img');
 		this.highResEl = document.createElement('img');
-		this.index = index;
-		this.setPosition(gallery.index);
 		this.thumb = thumb;
-		this.gallery = gallery;
 
 		this.setImageSrc();
 		let thumbRect = this.getThumbRect();
@@ -34,8 +31,8 @@ class GalleryImage {
 	}
 
 	calcScale() {
-		let maxWinWidthScale = (window.innerWidth / this.thumb.width) - (galleryPadding / this.thumb.width);
-		let maxWinHeightScale = (window.innerHeight / this.thumb.height) - (galleryPadding / this.thumb.height);
+		let maxWinWidthScale = (window.innerWidth / this.thumb.width) - (this.galleryPadding / this.thumb.width);
+		let maxWinHeightScale = (window.innerHeight / this.thumb.height) - (this.galleryPadding / this.thumb.height);
 
 		return Math.min(maxWinWidthScale, maxWinHeightScale);
 	}
@@ -45,10 +42,6 @@ class GalleryImage {
 			x: (window.innerWidth / 2) - (this.thumb.width / 2) ,
 			y: (window.innerHeight / 2) - (this.thumb.height / 2)
 		};
-	}
-
-	delete() {
-
 	}
 
 	getThumbRect() {
@@ -75,8 +68,8 @@ class GalleryImage {
 	}
 
 	setImageSrc() {
-		this.lowResEl.src = paths.thumb + this.gallery.photoList[this.index];
-		this.highResEl.src = paths.med + this.gallery.photoList[this.index];
+		this.lowResEl.src = paths.thumb + this.self.content;
+		this.highResEl.src = paths.med + this.self.content;
 	}
 
 	setImageTransform(x, y, scale) {
@@ -87,10 +80,6 @@ class GalleryImage {
 
 		this.lowResEl.style.transform = trans;
 		this.highResEl.style.transform = trans;
-	}
-
-	setPosition(index) {
-		this.position = this.index - index;
 	}
 
 	setThumb(visible) {
