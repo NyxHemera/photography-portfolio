@@ -1,8 +1,4 @@
-@green: #6ED6AC;
-@purple: #ACB2FF;
-@blue: #97C5FF;
-@dark-blue: #676F87;
-@blue-grey: #D3E2FF;
+@charcoal-grey: #1A1A1A;
 @off-white: #F7F7F7;
 
 html {
@@ -10,32 +6,44 @@ html {
 }
 
 body {
+	height: 100vh;
+	width: 100vw;
 	margin: 0;
 	font-family: 'Montserrat', sans-serif;
+	display: flex;
+	flex-flow: row nowrap;
 }
 
-::-webkit-scrollbar {
-	display: none;
+#sidebar {
+	> .sidebarSelection.homeLink {
+		margin-top: 1rem;
+	}
+	> .sidebarSelection {
+		margin: 0 1rem;
+
+		> a {
+			color: @charcoal-grey;
+			text-decoration: none;
+			font-size: 2.5rem;
+		}
+	}
 }
 
 #photoScroller {
 	display: flex;
 	flex-flow: row wrap;
-
-	> div > img {
-		max-width: 30vw;
-		max-height: 30vh;
-	}
+	flex-grow: 1;
 
 	> div {
 		padding: 1rem;
 
-		img:first-of-type {
-
-		}
-
-		img:nth-of-type(2) {
-			display: none;
+		> img {
+			max-width: 30vw;
+			max-height: 30vh;
+		
+			&:nth-of-type(2) {
+				display: none;
+			}
 		}
 	}
 }
@@ -54,4 +62,9 @@ body {
 	img {
 		position: absolute;
 	}
+}
+
+// Hide scrollbar
+::-webkit-scrollbar {
+	display: none;
 }

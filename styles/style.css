@@ -2,24 +2,37 @@ html {
   font-size: 12px;
 }
 body {
+  height: 100vh;
+  width: 100vw;
   margin: 0;
   font-family: 'Montserrat', sans-serif;
+  display: flex;
+  flex-flow: row nowrap;
 }
-::-webkit-scrollbar {
-  display: none;
+#sidebar > .sidebarSelection.homeLink {
+  margin-top: 1rem;
+}
+#sidebar > .sidebarSelection {
+  margin: 0 1rem;
+}
+#sidebar > .sidebarSelection > a {
+  color: #1a1a1a;
+  text-decoration: none;
+  font-size: 2.5rem;
 }
 #photoScroller {
   display: flex;
   flex-flow: row wrap;
+  flex-grow: 1;
+}
+#photoScroller > div {
+  padding: 1rem;
 }
 #photoScroller > div > img {
   max-width: 30vw;
   max-height: 30vh;
 }
-#photoScroller > div {
-  padding: 1rem;
-}
-#photoScroller > div img:nth-of-type(2) {
+#photoScroller > div > img:nth-of-type(2) {
   display: none;
 }
 #fullGallery {
@@ -35,4 +48,7 @@ body {
 }
 #fullGallery img {
   position: absolute;
+}
+::-webkit-scrollbar {
+  display: none;
 }
